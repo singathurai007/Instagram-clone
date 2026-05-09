@@ -1,0 +1,102 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "john_doe",
+      "fullName": "John Doe",
+      "bio": "Photographer 📸",
+      "profilePic": "https://i.pravatar.cc/150?img=1",
+      "followers": [
+        2,
+        3
+      ],
+      "following": [
+        2
+      ],
+      "posts": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "2",
+      "username": "emma_watson",
+      "fullName": "Emma Watson",
+      "bio": "Travel ✈️ Food 🍔",
+      "profilePic": "https://i.pravatar.cc/150?img=2",
+      "followers": [
+        1
+      ],
+      "following": [
+        1,
+        3
+      ],
+      "posts": [
+        3
+      ]
+    }
+  ],
+  "posts": [
+    {
+      "id": "1",
+      "userId": 1,
+      "image": "https://picsum.photos/500/500?random=1",
+      "caption": "Beautiful sunset 🌅",
+      "likes": [
+        2
+      ],
+      "comments": [
+        {
+          "id": 1,
+          "userId": 2,
+          "text": "Amazing pic 🔥"
+        }
+      ],
+      "createdAt": "2026-05-06T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "userId": 1,
+      "image": "https://picsum.photos/500/500?random=2",
+      "caption": "Nature vibes 🌿",
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-05-06T12:00:00Z"
+    }
+  ],
+  "stories": [
+    {
+      "id": "1",
+      "user": {
+        "username": "john_doe",
+        "profile_pic": "https://i.pravatar.cc/150?img=1"
+      },
+      "image": "https://picsum.photos/300/500?random=1"
+    },
+    {
+      "id": "2",
+      "user": {
+        "username": "emma_watson",
+        "profile_pic": "https://i.pravatar.cc/150?img=2"
+      },
+      "image": "https://picsum.photos/300/500?random=2"
+    }
+  ],
+  "messages": [
+    {
+      "id": "1",
+      "senderId": 1,
+      "receiverId": 2,
+      "text": "Hey Emma 👋"
+    }
+  ],
+  "profile": [
+    {
+      "id": "1",
+      "username": "john_doe",
+      "profilePic": "https://i.pravatar.cc/150?img=1"
+    }
+  ],
+  "suggestion": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}

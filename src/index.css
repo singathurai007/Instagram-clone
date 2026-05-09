@@ -1,0 +1,122 @@
+.w-20{
+  width:20%;
+}
+
+.w-30{
+  width: 30%;
+}
+
+.logo-text{
+  width: 100px;
+}
+
+.bi{
+  margin-right: 10px;
+}
+
+.story{
+  height: 70px;
+  padding: 10px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+}
+
+.posts-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.post-card {
+  width: 400px;
+  background: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.post-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.post-content {
+  padding: 10px;
+}
+
+.post-icons {
+  display: flex;
+  gap: 15px;
+  padding: 10px;
+  font-size: 24px;
+}
+
+.icon {
+  cursor: pointer;
+}
+
+.heart {
+  color: red;
+}
+
+.post-content {
+  padding: 0 10px 10px;
+}
+
+.likes {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+
+.post-content h3 {
+  font-size: 16px;
+  margin: 0;
+}
+.suggestions h3{
+  font-size: 16px;
+}
+.suggestion .dp{
+  margin-top: 0px!important;
+}
+.suggestions {
+  width: 320px;
+  padding: 15px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.post-card {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.gradient-border{
+  width:45px;
+  height: 45px;
+  display:flex;
+  align-items:center;
+  border-radius: 50%;
+  background: linear-gradient(45deg,#ff00ff,#ff6600,#ffcc00);
+}
+.story-dp{
+  width:40px;
+}
+
+.profile{
+  width:100px;
+  height:100px
+}
