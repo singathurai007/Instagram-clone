@@ -1,14 +1,14 @@
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.jsx";
-
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider
 } from "react-router-dom";
 
-import Viewstory from "./Viewstory.jsx";
+import "./index.css";
+import App from "./App.jsx";
 import Profile from "./Profile.jsx";
+import Viewstory from "./Viewstory.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: <Profile />
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" replace />
   }
 ]);
 

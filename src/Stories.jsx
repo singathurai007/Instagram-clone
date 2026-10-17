@@ -1,51 +1,90 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { getErrorMessage, getStories } from "./lib/api";
 
 function Stories() {
   const [stories, setStories] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/stories")
-      .then((res) => res.json())
-      .then((data) => setStories(data))
-      .catch((err) => console.log(err));
+    let active = true;
+
+    getStories()
+      .then((data) => {
+        if (!active) return;
+        setStories(data);
+        setStatus("ready");
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(getErrorMessage(err));
+        setStatus("error");
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const tot = stories.length;
+  if (status === "loading") {
+    return (
+      <section className="stories" aria-label="Stories" aria-busy="true">
+        {[1, 2, 3, 4, 5].map((item) => (
+          <div className="story-item" key={item}>
+            <div className="story-ring skeleton" />
+            <span className="skeleton skeleton-text" />
+          </div>
+        ))}
+      </section>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <section className="stories" aria-label="Stories">
+        <p className="state state-error" role="alert">
+          {error}
+        </p>
+      </section>
+    );
+  }
+
+  if (!stories.length) {
+    return (
+      <section className="stories" aria-label="Stories">
+        <p className="state">No stories yet.</p>
+      </section>
+    );
+  }
 
   return (
-    <div className="story d-flex">
-      {stories.length > 0 ? (
-        stories.map((story) => (
-          <div
-            key={story.id}
-            className="mx-2"
-            onClick={() =>
-              navigate(`/story/${story.id}/${tot}`)
-            }
-          >
-            <div className="gradient-border">
-              <img
-                src={story.user.profile_pic}
-                alt="dp"
-                className="story-dp rounded-circle"
-              />
-            </div>
+    <section className="stories" aria-label="Stories">
+      {stories.map((story) => (
+        <button
+          type="button"
+          key={story.id}
+          className="story-item"
+          onClick={() => navigate(`/story/${story.id}/${stories.length}`)}
+        >
+          <span className="story-ring">
+            <img
+              src={story.user?.profile_pic}
+              alt=""
+              className="story-avatar"
+              loading="lazy"
+            />
+          </span>
 
-            <p
-              className="text-truncate"
-              style={{ width: "50px" }}
-            >
-              {story.user.username}
-            </p>
-          </div>
-        ))
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+          <span className="story-username">
+            {story.user?.username ?? "unknown"}
+          </span>
+        </button>
+      ))}
+    </section>
   );
 }
 

@@ -39,16 +39,16 @@
   "posts": [
     {
       "id": "1",
-      "userId": 1,
+      "userId": "1",
       "image": "https://picsum.photos/500/500?random=1",
       "caption": "Beautiful sunset 🌅",
       "likes": [
-        2
+        "2"
       ],
       "comments": [
         {
           "id": 1,
-          "userId": 2,
+          "userId": "2",
           "text": "Amazing pic 🔥"
         }
       ],
@@ -56,7 +56,7 @@
     },
     {
       "id": "2",
-      "userId": 1,
+      "userId": "1",
       "image": "https://picsum.photos/500/500?random=2",
       "caption": "Nature vibes 🌿",
       "likes": [],
@@ -85,8 +85,8 @@
   "messages": [
     {
       "id": "1",
-      "senderId": 1,
-      "receiverId": 2,
+      "senderId": "1",
+      "receiverId": "2",
       "text": "Hey Emma 👋"
     }
   ],
@@ -97,6 +97,23 @@
       "profilePic": "https://i.pravatar.cc/150?img=1"
     }
   ],
-  "suggestion": [],
+  "suggestion": [
+    {
+      "id": "2",
+      "username": "emma_watson",
+      "profilePic": "https://i.pravatar.cc/150?img=2"
+    },
+    {
+      "id": "3",
+      "username": "liam_parker",
+      "profilePic": "https://i.pravatar.cc/150?img=12"
+    },
+    {
+      "id": "4",
+      "username": "sofia_mendes",
+      "profilePic": "https://i.pravatar.cc/150?img=45"
+    }
+  ],
+  "following": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

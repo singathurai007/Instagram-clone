@@ -1,13 +1,13 @@
-import React from 'react'
-import Stories from './Stories'
-import Posts from './Posts'
+import Posts from "./Posts";
+import Stories from "./Stories";
+
 function Feed() {
   return (
-    <div>
-    <div><Stories/></div>
-    <div><Posts/></div>
-    </div>
-  )
+    <main className="feed">
+      <Stories />
+      <Posts />
+    </main>
+  );
 }
 
-export default Feed
+export default Feed;

@@ -1,130 +1,223 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  CURRENT_USER_ID,
+  getErrorMessage,
+  getFollowing,
+  getUser,
+  unfollowUser,
+  updateUser
+} from "./lib/api";
 
 function Profile() {
+  const [user, setUser] = useState(null);
+  const [following, setFollowing] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const [profile, setProfile] = useState(null);
-
-  const [followers, setFollowers] = useState([]);
-
-  const [unfollowed, setUnfollowed] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    let active = true;
 
-    axios.get("http://localhost:3000/profile/1")
-      .then((data) => setProfile(data.data))
-      .catch((err) => console.log(err));
+    Promise.all([getUser(), getFollowing()])
+      .then(([profile, people]) => {
+        if (!active) return;
+        setUser(profile);
+        setFollowing(people);
+        setStatus("ready");
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(getErrorMessage(err));
+        setStatus("error");
+      });
 
-    axios.get("http://localhost:3000/suggestion")
-      .then((data) => setFollowers(data.data))
-      .catch((err) => console.log(err));
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  }, [unfollowed]);
-
-  function handledOnChange(e) {
-
-    setProfile((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setUser((current) => ({ ...current, [name]: value }));
+    setNotice("");
   }
 
-  const handleUpdate = async () => {
+  async function handleSave(event) {
+    event.preventDefault();
 
-    axios.put(
-      "http://localhost:3000/profile/1",
-      profile
-    )
-      .then(() => console.log("updated"))
-      .catch((err) => console.log(err));
+    setSaving(true);
+    setError("");
+    setNotice("");
 
-  };
+    try {
+      const updated = await updateUser(CURRENT_USER_ID, user);
+      setUser(updated);
+      setNotice("Profile updated.");
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const handleUnfollow = async (id) => {
+  async function handleUnfollow(id) {
+    try {
+      await unfollowUser(id);
+      setFollowing((current) => current.filter((item) => item.id !== id));
+      setNotice("Unfollowed.");
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  }
 
-    axios.delete(
-      `http://localhost:3000/suggestion/${id}`
-    )
-      .then(() => {
-        alert("Unfollowed");
-        setUnfollowed(!unfollowed);
-      })
-      .catch((err) => console.log(err));
+  if (status === "loading") {
+    return (
+      <div className="page" aria-busy="true">
+        <div className="profile-card">
+          <span className="skeleton skeleton-avatar-lg" />
+          <span className="skeleton skeleton-text" />
+        </div>
+      </div>
+    );
+  }
 
-  };
+  if (status === "error") {
+    return (
+      <div className="page">
+        <p className="state state-error" role="alert">
+          {error}
+        </p>
+        <button
+          type="button"
+          className="btn btn-dark"
+          onClick={() => navigate("/")}
+        >
+          Back to feed
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="m-5">
+    <div className="page">
+      <header className="page-header">
+        <button
+          type="button"
+          className="page-back"
+          onClick={() => navigate("/")}
+          aria-label="Back to feed"
+        >
+          <i className="bi bi-arrow-left" aria-hidden="true" />
+        </button>
 
-      {profile ? (
+        <h1>Profile</h1>
+      </header>
 
-        <div>
+      {notice && <p className="state state-success">{notice}</p>}
 
-          <img
-            src={profile.profilePic}
-            className="rounded-circle"
-            width="120"
-            height="120"
-          />
+      {error && (
+        <p className="state state-error" role="alert">
+          {error}
+        </p>
+      )}
 
-          <h5>{profile.username}</h5>
+      <div className="profile-card">
+        <img
+          className="profile-avatar"
+          src={user.profilePic}
+          alt=""
+          loading="lazy"
+        />
 
-          <input
-            type="text"
-            value={profile.username}
-            name="username"
-            className="form-control my-4"
-            onChange={handledOnChange}
-          />
+        <div className="profile-summary">
+          <h2>{user.username}</h2>
+          <p className="profile-fullname">
+            {user.fullName ?? "—"}
+            {user.bio ? ` · ${user.bio}` : ""}
+          </p>
 
-          <input
-            type="text"
-            name="profilePic"
-            value={profile.profilePic}
-            className="form-control"
-            onChange={handledOnChange}
-          />
-
-          <button
-            className="btn btn-primary my-2"
-            onClick={handleUpdate}
-          >
-            Update
-          </button>
-
+          <ul className="profile-stats">
+            <li>
+              <strong>{user.posts?.length ?? 0}</strong>
+              <span>posts</span>
+            </li>
+            <li>
+              <strong>{user.followers?.length ?? 0}</strong>
+              <span>followers</span>
+            </li>
+            <li>
+              <strong>{user.following?.length ?? 0}</strong>
+              <span>following</span>
+            </li>
+          </ul>
         </div>
+      </div>
 
-      ) : (
-        <div>Loading...</div>
-      )}
+      <form className="profile-form" onSubmit={handleSave}>
+        <h3>Edit profile</h3>
 
-      {followers.length > 0 && (
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          name="username"
+          className="form-control"
+          value={user.username ?? ""}
+          onChange={handleChange}
+        />
 
-        followers.map((follower) => (
+        <label htmlFor="profilePic">Profile picture URL</label>
+        <input
+          id="profilePic"
+          type="url"
+          name="profilePic"
+          className="form-control"
+          value={user.profilePic ?? ""}
+          onChange={handleChange}
+        />
 
-          <div
-            key={follower.id}
-            className="d-flex my-2"
-          >
+        <button type="submit" className="btn btn-primary" disabled={saving}>
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+      </form>
 
-            {follower.username}
+      <section className="profile-following">
+        <h3>Following</h3>
 
-            <button
-              className="btn btn-secondary ms-auto"
-              onClick={() =>
-                handleUnfollow(follower.id)
-              }
-            >
-              Unfollow
-            </button>
-
-          </div>
-
-        ))
-
-      )}
-
+        {following.length ? (
+          <ul className="rail-list">
+            {following.map((person) => (
+              <li className="rail-row" key={person.id}>
+                <img
+                  className="rail-avatar"
+                  src={person.profilePic}
+                  alt=""
+                  loading="lazy"
+                />
+                <div className="rail-user">
+                  <strong>{person.username}</strong>
+                </div>
+                <button
+                  type="button"
+                  className="rail-follow is-following"
+                  onClick={() => handleUnfollow(person.id)}
+                >
+                  Unfollow
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="state">
+            You are not following anyone yet. Follow someone from the feed.
+          </p>
+        )}
+      </section>
     </div>
   );
 }

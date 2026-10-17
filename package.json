@@ -1,12 +1,26 @@
 {
-  "name": "instagram",
+  "name": "instagram-clone",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "A responsive Instagram clone built with React 19, Vite and Bootstrap, backed by a json-server REST API.",
   "type": "module",
+  "keywords": [
+    "instagram-clone",
+    "react",
+    "vite",
+    "bootstrap",
+    "json-server",
+    "react-router"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
+    "server": "json-server db.json --port 3000",
     "build": "vite build",
-    "lint": "eslint .", 
+    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -25,6 +39,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "json-server": "^1.0.0-beta.15",
     "vite": "^8.0.10"
   }
 }

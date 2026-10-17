@@ -1,126 +1,152 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+
+import {
+  CURRENT_USER_ID,
+  followUser,
+  getErrorMessage,
+  getFollowing,
+  getProfile,
+  getSuggestions
+} from "./lib/api";
 
 function Suggestion() {
-
-  const [profile, setProfile] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
+  const [followingIds, setFollowingIds] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    let active = true;
 
-    fetch("http://localhost:3000/profile")
-      .then((res) => res.json())
-      .then((data) => setProfile(data))
-      .catch((err) => console.log(err));
+    Promise.all([getProfile(), getSuggestions(), getFollowing()])
+      .then(([currentProfile, people, following]) => {
+        if (!active) return;
+        setProfile(currentProfile);
+        setSuggestions(people);
+        setFollowingIds(following.map((item) => item.id));
+        setStatus("ready");
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(getErrorMessage(err));
+        setStatus("error");
+      });
 
-    fetch("http://localhost:3000/suggestion")
-      .then((res) => res.json())
-      .then((data) => setSuggestions(data))
-      .catch((err) => console.log(err));
-
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const handleFollow = async (id, username) => {
+  async function handleFollow(user) {
+    /* Optimistic: show "Following" straight away. */
+    setFollowingIds((current) => [...current, user.id]);
 
-    axios.post(
-      "http://localhost:3000/followers",
-      {
-        id,
-        username
-      }
-    )
-      .then(() => alert("Followed"))
-      .catch((err) => console.log(err));
+    try {
+      await followUser({ ...user, followedBy: CURRENT_USER_ID });
+    } catch (err) {
+      setFollowingIds((current) =>
+        current.filter((id) => id !== user.id)
+      );
+      setError(getErrorMessage(err));
+    }
+  }
 
-  };
+  if (status === "loading") {
+    return (
+      <aside className="rail" aria-label="Suggestions" aria-busy="true">
+        {[1, 2, 3].map((item) => (
+          <div className="rail-row" key={item}>
+            <span className="skeleton skeleton-avatar" />
+            <span className="skeleton skeleton-text" />
+          </div>
+        ))}
+      </aside>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <aside className="rail" aria-label="Suggestions">
+        <p className="state state-error" role="alert">
+          {error}
+        </p>
+      </aside>
+    );
+  }
 
   return (
-    <div>
-
-      <div className="suggestions m-4">
-
-        {profile.length > 0 && (
-
-          profile.map((user) => (
-
-            <div
-              className="post-card d-flex align-items-center p-2"
-              key={user.id}
-            >
-
-              <img
-                className="post-image"
-                src={user.profilePic}
-                alt=""
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%"
-                }}
-              />
-
-              <h5 className="ms-2">
-                {user.username}
-              </h5>
-
-            </div>
-
-          ))
-
-        )}
-
-        <div className="d-flex mt-3">
-          <p>Suggestions for you</p>
-          <b className="ms-auto">See all</b>
+    <aside className="rail" aria-label="Suggestions">
+      {profile && (
+        <div className="rail-account">
+          <img
+            className="rail-avatar"
+            src={profile.profilePic}
+            alt=""
+            loading="lazy"
+          />
+          <div className="rail-user">
+            <strong>{profile.username}</strong>
+            <span>Signed in</span>
+          </div>
+          <button type="button" className="rail-switch" disabled>
+            Switch
+          </button>
         </div>
+      )}
 
-        {suggestions.length > 0 ? (
-
-          suggestions.map((item) => (
-
-            <div
-              className="post-card d-flex align-items-center p-2"
-              key={item.id}
-            >
-
-              <img
-                className="post-image"
-                src={item.profilePic}
-                alt=""
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%"
-                }}
-              />
-
-              <h5 className="ms-2">
-                {item.username}
-              </h5>
-
-              <button
-                className="btn btn-link text-primary ms-auto"
-                onClick={() =>
-                  handleFollow(
-                    item.id,
-                    item.username
-                  )
-                }
-              >
-                Follow
-              </button>
-
-            </div>
-
-          ))
-
-        ) : (
-          <h2>Loading...</h2>
-        )}
-
+      <div className="rail-heading">
+        <span>Suggested for you</span>
+        <button type="button" className="rail-see-all" disabled>
+          See all
+        </button>
       </div>
 
-    </div>
+      {suggestions.length ? (
+        <ul className="rail-list">
+          {suggestions.map((user) => {
+            const isFollowing = followingIds.includes(user.id);
+
+            return (
+              <li className="rail-row" key={user.id}>
+                <img
+                  className="rail-avatar"
+                  src={user.profilePic}
+                  alt=""
+                  loading="lazy"
+                />
+
+                <div className="rail-user">
+                  <strong>{user.username}</strong>
+                  <span>Suggested for you</span>
+                </div>
+
+                <button
+                  type="button"
+                  className={`rail-follow${isFollowing ? " is-following" : ""}`}
+                  onClick={() => handleFollow(user)}
+                  disabled={isFollowing}
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="state">No suggestions right now.</p>
+      )}
+
+      {error && (
+        <p className="state state-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      <footer className="rail-footer">
+        A React demo project · Data served by json-server
+      </footer>
+    </aside>
   );
 }
 
