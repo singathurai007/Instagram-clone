@@ -130,4 +130,4 @@ The production build is a static bundle, so it can be hosted anywhere. Two thing
 **Singathurai C** — Software · Cloud · DevOps Engineer
 
 - GitHub: https://github.com/singathurai007
-- Portfolio: https://singathurai007.github.io/singathurai-portfolio/
+- Portfolio: https://singathurai-portfolio.onrender.com/
