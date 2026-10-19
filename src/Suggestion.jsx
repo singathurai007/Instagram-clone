@@ -24,7 +24,7 @@ function Suggestion() {
         if (!active) return;
         setProfile(currentProfile);
         setSuggestions(people);
-        setFollowingIds(following.map((item) => item.id));
+        setFollowingIds(following.map((item) => item.userId));
         setStatus("ready");
       })
       .catch((err) => {

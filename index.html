@@ -29,6 +29,18 @@
       integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous"
     />
+
+    <!-- Apply the saved theme before first paint to avoid a flash of the wrong colours. -->
+    <script>
+      try {
+        var savedTheme = localStorage.getItem("instagram-clone:theme");
+        if (savedTheme === "light" || savedTheme === "dark") {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        }
+      } catch (error) {
+        /* storage unavailable — fall back to the OS colour scheme */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

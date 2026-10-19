@@ -7,13 +7,40 @@ import {
 
 import "./index.css";
 import App from "./App.jsx";
+import CreatePost from "./CreatePost.jsx";
+import Explore from "./Explore.jsx";
+import Notifications from "./Notifications.jsx";
+import PostDetail from "./PostDetail.jsx";
 import Profile from "./Profile.jsx";
+import Saved from "./Saved.jsx";
 import Viewstory from "./Viewstory.jsx";
+import { ThemeProvider } from "./context/theme.jsx";
+import { ToastProvider } from "./context/toast.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />
+  },
+  {
+    path: "/explore",
+    element: <Explore />
+  },
+  {
+    path: "/create",
+    element: <CreatePost />
+  },
+  {
+    path: "/post/:id",
+    element: <PostDetail />
+  },
+  {
+    path: "/saved",
+    element: <Saved />
+  },
+  {
+    path: "/notifications",
+    element: <Notifications />
   },
   {
     path: "/story/:id/:tot",
@@ -30,5 +57,9 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+  <ThemeProvider>
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
+  </ThemeProvider>
 );

@@ -1,20 +1,29 @@
 import { NavLink, useNavigate } from "react-router-dom";
 
 import logo from "./assets/images.png";
+import { useTheme } from "./context/theme.jsx";
 
 const LINKS = [
   { icon: "bi-house", label: "Home", to: "/" },
-  { icon: "bi-search", label: "Search" },
-  { icon: "bi-compass", label: "Explore" },
-  { icon: "bi-collection-play", label: "Reels" },
-  { icon: "bi-chat-dots-fill", label: "Messages" },
-  { icon: "bi-chat-square-heart", label: "Notifications" },
-  { icon: "bi-plus-square", label: "Create" },
-  { icon: "bi-person-circle", label: "Profile", to: "/profile" }
+  { icon: "bi-compass", label: "Explore", to: "/explore" },
+  { icon: "bi-plus-square", label: "Create", to: "/create" },
+  {
+    icon: "bi-chat-square-heart",
+    label: "Notifications",
+    to: "/notifications"
+  },
+  { icon: "bi-person-circle", label: "Profile", to: "/profile" },
+  { icon: "bi-bookmark", label: "Saved", to: "/saved" },
+  /* Wireframes for the areas this demo does not implement. */
+  { icon: "bi-collection-play", label: "Reels", muted: true },
+  { icon: "bi-chat-dots-fill", label: "Messages", muted: true }
 ];
 
 function Sidebar() {
   const navigate = useNavigate();
+  const { resolvedTheme, toggleTheme } = useTheme();
+
+  const isDark = resolvedTheme === "dark";
 
   return (
     <nav className="sidebar" aria-label="Primary">
@@ -29,12 +38,15 @@ function Sidebar() {
         </button>
 
         <ul className="sidebar-links">
-          {LINKS.map(({ icon, label, to }) =>
-            to ? (
-              <li key={label}>
+          {LINKS.map(({ icon, label, to, muted }) => (
+            <li
+              key={label}
+              className={muted ? "sidebar-item-secondary" : undefined}
+            >
+              {to ? (
                 <NavLink
                   to={to}
-                  end
+                  end={to === "/"}
                   className={({ isActive }) =>
                     `sidebar-link${isActive ? " active" : ""}`
                   }
@@ -42,28 +54,35 @@ function Sidebar() {
                   <i className={`bi ${icon}`} aria-hidden="true" />
                   <span>{label}</span>
                 </NavLink>
-              </li>
-            ) : (
-              <li key={label}>
-                <button type="button" className="sidebar-link" disabled>
+              ) : (
+                <button
+                  type="button"
+                  className="sidebar-link"
+                  disabled
+                  title={`${label} — coming soon`}
+                >
                   <i className={`bi ${icon}`} aria-hidden="true" />
                   <span>{label}</span>
                 </button>
-              </li>
-            )
-          )}
+              )}
+            </li>
+          ))}
         </ul>
       </div>
 
       <div className="sidebar-bottom">
-        <button type="button" className="sidebar-link" disabled>
-          <i className="bi bi-threads" aria-hidden="true" />
-          <span>Threads</span>
-        </button>
-
-        <button type="button" className="sidebar-link" disabled>
-          <i className="bi bi-list" aria-hidden="true" />
-          <span>More</span>
+        <button
+          type="button"
+          className="sidebar-link"
+          onClick={toggleTheme}
+          aria-pressed={isDark}
+          title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+        >
+          <i
+            className={`bi ${isDark ? "bi-moon-stars-fill" : "bi-sun-fill"}`}
+            aria-hidden="true"
+          />
+          <span>{isDark ? "Light mode" : "Dark mode"}</span>
         </button>
       </div>
     </nav>
